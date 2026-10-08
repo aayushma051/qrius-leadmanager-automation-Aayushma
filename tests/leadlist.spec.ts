@@ -1,27 +1,33 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/loginpage';
+import { admin, agent } from '../test-data/users';
 
-test.describe('Leads list', () => {
+test.describe('Leads List', () => {
+  let loginPage: LoginPage;
 
-  test('shows the correct number of leads', async ({ page }) => {
-    // prediction: the Leads page shows 12 leads
-    await page.goto('/login');
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await loginPage.goto();
+  });
 
-    await page.getByTestId('username').fill('admin.qrius');
-    await page.getByTestId('password').fill('Admin@123');
-    await page.getByTestId('login-button').click();
+  test('shows the correct number of leads after signing in', async ({ page }) => {
+    // Prediction: 12 leads should be displayed after signing in.
+    await loginPage.login(admin);
 
     await expect(page.getByTestId('lead-row')).toHaveCount(12);
   });
 
-  test('shows the signed-in user role', async ({ page }) => {
-    // prediction: the role badge shows ADMIN for the admin user
-    await page.goto('/login');
-
-    await page.getByTestId('username').fill('admin.qrius');
-    await page.getByTestId('password').fill('Admin@123');
-    await page.getByTestId('login-button').click();
+  test('role badge shows ADMIN for admin user', async ({ page }) => {
+    // Prediction: the role badge should show ADMIN.
+    await loginPage.login(admin);
 
     await expect(page.getByTestId('nav-role')).toHaveText('ADMIN');
   });
 
+  test('role badge shows AGENT for agent user', async ({ page }) => {
+    // Prediction: the role badge should show AGENT.
+    await loginPage.login(agent);
+
+    await expect(page.getByTestId('nav-role')).toHaveText('AGENT');
+  });
 });

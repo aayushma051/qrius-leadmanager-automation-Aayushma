@@ -1,22 +1,41 @@
 # Findings
 
-## Finding 1: Valid admin login does not navigate to Leads
+### Search - Company Name
 
-* **Test:** Admin can sign in and reaches the Leads page
-* **Result:** Failed
-* **Judgment:** The application has a bug
-* **Reason:** The test used the provided valid admin credentials, but after clicking Login the application remained on `/login` instead of navigating to `/leads`.
+- **Test:** Searching by company name narrows the list
+- **Result:** Failed
+- **Verdict:** The application has a bug.
+- **Reasoning:** Searching for the existing company "HimalKart" does not filter the lead list to the matching lead.
 
-## Finding 2: Valid agent login does not navigate to Leads
 
-* **Test:** Agent can sign in and sees their role
-* **Result:** Failed
-* **Judgment:** The application has a bug
-* **Reason:** The test used the provided valid agent credentials, but after clicking Login the application remained on `/login` instead of navigating to `/leads`.
+### Search - Lead Count
 
-## Finding 3: Wrong-password error message differs from prediction
+- **Test:** Lead count updates after searching
+- **Predicted:** After searching for "Sita Sharma" and displaying one matching lead, the count should update to show 1 out of 12 leads.
+- **Actual:** One lead is displayed, but the count still shows "Showing 12 of 12 leads".
+- **Verdict:** The application has a bug.
+- **Reasoning:** The search correctly filters the displayed lead, but the count does not update to reflect the filtered results.
 
-* **Test:** Wrong password shows an error and stays on the login page
-* **Result:** Failed
-* **Judgment:** My test is wrong
-* **Reason:** The application displayed `Login failed`, while my test expected `Invalid username or password`.
+
+### Add Lead - Status
+
+- **Predicted:** After adding a lead with status Qualified, its row should show status Qualified.
+- **Actual:** The lead is added, but its row shows status New.
+- **Verdict:** The application has a bug.
+- **Reasoning:** The frontend defaults the lead status to New instead of saving the status selected by the user.
+
+
+### Delete Lead
+
+- **Predicted:** After the admin deletes a lead, it should no longer appear in the leads list.
+- **Actual:** The test initially depended on a seeded lead, which was deleted on the first run and caused the test to fail on subsequent runs because the lead no longer existed.
+- **Verdict:** My test was wrong.
+- **Reasoning:** The application deleted the lead correctly. The test depended on shared seed data that was modified by the test. The test was updated to create its own lead and delete that lead instead.
+
+
+### Codegen + Trace Viewer
+
+- **Flow:** Admin login and search for an existing lead.
+- **Result:** Passed in Chromium, Firefox, and WebKit.
+- **Finding:** The Codegen-generated test was cleaned up to use the existing Page Object Model and test data.
+- **Trace Viewer:** Not required because the cleaned test passed in all browsers.
